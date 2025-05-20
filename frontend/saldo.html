@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance Explorer</title>
+</head>
+
+<style>
+    footer a:hover {
+        color: #414678;
+    }
+
+    footer a {
+        color: white;
+        text-decoration: none;
+    }
+
+    footer a:active {
+        color: #686ead;
+    }
+</style>
+
+<body
+    style="font-size: 18px; padding: 1em; background-color: #141414; font-family: 'Roboto', sans-serif; color:#414678">
+    <h1 style="text-align: center;">Balance Explorer</h1>
+
+    <div style="text-align: left; margin-top: 2vh;">
+        <label for="address">Address:</label>
+        <input id="address" type="text"
+            style="width: 100%; margin-bottom: 2vh ;border:none; color:white; height: 4vh; outline:none ;background-color: #4f4f4f;"
+            placeholder="0x1234...">
+    </div>
+
+    <div style="text-align: left; margin-top: 2vh;">
+        <label for="token">Token:</label>
+        <select id="token"
+            style="width: 100%;margin-bottom: 2vh; border:none; color:white; height: 4vh; outline:none; background-color: #4f4f4f;">
+            <option value="ETH">ETH</option>
+            <option value="USDT">USDT</option>
+            <option value="USDC">USDC</option>
+        </select>
+    </div>
+
+    <div style="text-align: left; margin-top: 2vh;">
+        <label for="date">Date </label>
+        <input id="date" type="date"
+            style="width: 100%; margin-bottom: 2vh; border:none; color:white; height: 4vh; outline:none; background-color: #4f4f4f;">
+    </div>
+
+
+    <div style="text-align: center; margin-top: 2vh;">
+        <button id="View_balance"
+            style="background-color: #4f4f4f; height: 4vh; border: none;box-sizing: border-box; color: white;">View
+            balance</button>
+    </div>
+
+    <div id="message" style="margin-top: 2vh; color: white; text-align: center;"></div>
+
+    <footer
+        style="background-color: #222; box-sizing: border-box; padding: 1em ; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; color: white;">
+        <nav
+            style="display: flex; justify-content:space-around;padding-left: 4vh;padding-right: 4vh; font-size: 1.2em;">
+            <a href="/">Transaction Crawler</a>
+            <a href="/explorer">Balance Explorer</a>
+        </nav>
+    </footer>
+
+    <script>
+        document.getElementById("View_balance").addEventListener("click", () => {
+            const wallet = document.getElementById("address").value.trim();
+            const token = document.getElementById("token").value;
+            const date = document.getElementById("date").value;
+            const message = document.getElementById("message");
+
+            message.textContent = "";
+            if (!wallet || !date) {
+                message.textContent = "Enter valid address and date!";
+                return;
+            }
+
+            const url = `/explorer_history?wallet=${wallet}&date=${date}&token=${token}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error retrieving data.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    message.style.color = "white";
+                    message.textContent = `${data.balance} (${data.token})`;
+                })
+                .catch(err => {
+                    message.style.color = "red";
+                    message.textContent = "Error: " + err.message;
+                });
+        });
+    </script>
+
+
+
+</body>
+
+</html>

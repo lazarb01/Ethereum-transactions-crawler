@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum Transactions Crawler</title>
+</head>
+
+<style>
+    footer a:hover {
+        color: #414678;
+    }
+
+    footer a {
+        color: white;
+        text-decoration: none;
+    }
+
+    footer a:active {
+        color: #686ead;
+    }
+</style>
+
+<body
+    style="font-size: 18px; padding: 1em; background-color: #141414; font-family: 'Roboto', sans-serif; color:#414678">
+    <h1 style="text-align: center;">Transaction Crawler</h1>
+
+    <div style="text-align: left;">
+        <label for="address">Address:</label>
+        <input id="address" type="text"
+            style="width: 98%; margin-bottom: 10px;border:none; color:white; height: 4vh; outline:none ;background-color: #4f4f4f;"
+            placeholder="0x1234...">
+        <br>
+        <label for="block_numeber">Block number:</label>
+        <input id="block_number" type="number"
+            style="width: 98%;color:white; background-color:#4f4f4f; outline: none; height: 4vh; border: none;"
+            placeholder="npr. 9000000">
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <button id="View"
+            style="background-color: #4f4f4f; height: 4vh; border: none;box-sizing: border-box; color: white;">View</button>
+    </div>
+
+    <div id="message" style="margin-top: 20px; color: white; text-align: center;"></div>
+
+    <div style="margin-top: 30px; background-color: #777ba3;">
+        <table id="table" border="1" style="text-align:center;width: 100%; border-collapse: collapse; display: none;">
+            <thead style="background-color: #f2f2f2; line-height: 5vh;">
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>ETH</th>
+                </tr>
+            </thead>
+            <tbody style="color:white; line-height: 4vh;"></tbody>
+        </table>
+    </div>
+    <footer
+        style="background-color: #222; box-sizing: border-box; padding: 1em ; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; color: white;">
+        <nav
+            style="display: flex; justify-content:space-around;padding-left: 20px;padding-right: 20px; font-size: 1.2em;">
+            <a href="/">Transaction Crawler</a>
+            <a href="/explorer">Balance Explorer</a>
+        </nav>
+    </footer>
+
+    <script>
+        document.getElementById("View").addEventListener("click", () => {
+            const adresa = document.getElementById("address").value;
+            const blok = document.getElementById("block_number").value;
+            const message = document.getElementById("message");
+            const table = document.getElementById("table");
+            const tbody = table.querySelector("tbody");
+
+            message.textContent = "";
+            table.style.display = "none";
+            tbody.innerHTML = "";
+
+            if (!adresa || !blok) {
+                message.textContent = "Enter valid address and block number!";
+                message.style.color = "white"
+                return;
+            }
+
+            const url = `http://localhost:8080/crawler?wallet=${adresa}&start_block=${blok}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Error fetching transactions");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.transactions.length) {
+                        message.textContent = "No transactions have been found.";
+                        return;
+                    }
+
+                    data.transactions.forEach(tx => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${tx.from}</td>
+                            <td>${tx.to}</td>
+                            <td>${tx.valueETH}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    table.style.display = "table";
+                })
+                .catch(error => {
+                    message.textContent = "Error: " + error.message;
+                });
+        });
+    </script>
+</body>
+
+</html>
