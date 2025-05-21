@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query # type: ignore
 from fastapi.responses import HTMLResponse # type: ignore
-from fastapi.staticfiles import StaticFiles # type: ignore
 import httpx # type: ignore
 import os
 from datetime import datetime
@@ -94,9 +93,6 @@ async def get_transactions(
     transactions = []
     for tx in data["result"]:
         transactions.append({
-            "blockNumber": tx["blockNumber"],
-            "timeStamp": tx["timeStamp"],
-            "hash": tx["hash"],
             "from": tx["from"],
             "to": tx["to"],
             "valueETH": int(tx["value"]) / 10**18
