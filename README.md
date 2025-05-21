@@ -22,7 +22,7 @@
 - **Backend:** Python, FastAPI
 - **Frontend:** HTML, CSS, JavaScript
 - **Blockchain Access:** Web3.py, Etherscan & Infura APIs
-- **Docker:** 
+- **Docker** 
 
 ---
 
